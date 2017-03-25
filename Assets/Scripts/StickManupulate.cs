@@ -33,7 +33,7 @@ public class StickManupulate : MonoBehaviour
 
 	private int totalScore = 0;
 
-	private objects currentObject;
+	private objects currentObject,previousObject;
 
 
 	void Start ()
@@ -63,7 +63,10 @@ public class StickManupulate : MonoBehaviour
 
 	private int controlSign = 1;
 
-	private int objectPointer = 1;
+	private int objectPointer = 0;
+
+
+	int stackPositionNext = 0;
 
 
 	private void updateBases(){
@@ -89,22 +92,27 @@ public class StickManupulate : MonoBehaviour
 		baseWidth = currentObject.right.transform.localPosition.x - currentObject.left.transform.localPosition.x;
 	}
 
+	private int noOfClicksDown = 0;
+
 	private IEnumerator incrementQueue(){
 
-		yield return new WaitForSeconds(3);
-		Destroy(currentObject.baseObject.gameObject.GetComponent<Rigidbody>());
-		currentObject.baseObject.transform.localRotation =  Quaternion.Euler (0f, 0f, 0f);
-		objectPointer = objectPointer - 1 < 0 ? stack.Length - 1 : objectPointer - 1;
+		noOfClicksDown++;
+		stackPositionNext -= 2;
 
-		Vector3 Object0Lp = stack [0].baseObject.transform.localPosition;;
+		previousObject = currentObject;
+		objectPointer = objectPointer + 1 >= stack.Length ? 0 : objectPointer + 1;
+		yield return new WaitForSeconds(2);
+		Destroy(previousObject.baseObject.gameObject.GetComponent<Rigidbody>());
 
-		for (int i = 0; i < stack.Length; i++) {
-			if (i == stack.Length - 1) {
-				stack [i].baseObject.transform.localPosition = Object0Lp;
-				break;
-			}
-			stack [i].baseObject.transform.localPosition = localPositions [i + 1];
-		}
+		float translate = 45f;
+		previousObject.left.transform.localRotation = Quaternion.Euler (0, 0, translate);
+		previousObject.right.transform.localRotation = Quaternion.Euler (0, 0, 90 + translate);
+		float cornerAngle = Mathf.Deg2Rad * (translate);
+		previousObject.right.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Cos (cornerAngle) + .04f, .1f);
+		previousObject.left.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Sin (cornerAngle) + .04f, .1f);
+
+		previousObject.baseObject.transform.localRotation =  Quaternion.Euler (0f, 0f, 0f);
+		previousObject.baseObject.transform.localPosition = new Vector3 (0f, noOfClicksDown * 2f + 4f, 0f);
 
 	}
 
@@ -112,11 +120,16 @@ public class StickManupulate : MonoBehaviour
 	void Update ()
 	{
 
+		Vector3 stackposition = mainStack.transform.localPosition;
+		if (stackposition.y> stackPositionNext) {
+			stackposition.y -= Time.deltaTime * 5;
+			mainStack.transform.localPosition = stackposition;
+		}
 
 		currentObject = stack[objectPointer];
 		updateBases ();
 
-		translate += Time.deltaTime * 5 * controlSign*(totalScore==0?1:totalScore);
+		translate += Time.deltaTime * 5 * controlSign * (totalScore == 0 ? 1 : totalScore);
 
 		if (translate < 20) {
 			controlSign = 1;
