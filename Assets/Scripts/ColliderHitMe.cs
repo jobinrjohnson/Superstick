@@ -2,36 +2,50 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColliderhitMe : MonoBehaviour {
+public class ColliderhitMe : MonoBehaviour
+{
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+	void Start ()
+	{
 		
 	}
 
+	void Update ()
+	{
+		
+	}
 
-	void OnCollisionEnter(Collision collision) {
+	public Transform explosionPrefab;
+	private Transform explosive = null;
 
-		if (StickManupulate.DOES_IT_HIT) {
+	IEnumerator destroyExplosive ()
+	{
+		yield return new WaitForSeconds (2);
+		if (explosive != null) {
+			Destroy (explosive.gameObject);
+		}
+	}
+
+	void OnCollisionEnter (Collision collision)
+	{
+
+		if (StickManupulate.DOES_IT_HIT || gameObject.GetComponent<MeshRenderer> ().enabled == false) {
+			StickManupulate.DOES_IT_HIT = true;
 			return;
 		}
 
-		ContactPoint contact = collision.contacts[0];
+		ContactPoint contact = collision.contacts [0];
 		Quaternion rot = Quaternion.FromToRotation (Vector3.up, contact.normal);
 		Vector3 pos = contact.point;
-		float normalisedScore = 2f - Mathf.Abs (pos.x);
-		StickManupulate.addScore (normalisedScore);
 
+		float normalisedScore = 2f - Mathf.Abs (pos.x);
+		StickManupulate.addScore (normalisedScore * 2);
 		StickManupulate.DOES_IT_HIT = true;
 
-		//print (pos);
-		//Instantiate(explosionPrefab, pos, rot);
-		//Destroy(gameObject);
+		gameObject.GetComponent<MeshRenderer> ().enabled = false;
+		Destroy (collision.gameObject.GetComponent<Rigidbody> ());
+		explosive = Instantiate (explosionPrefab, pos, rot);
+		StartCoroutine (destroyExplosive ());
 	}
 
 }
