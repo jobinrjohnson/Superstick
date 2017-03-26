@@ -16,6 +16,15 @@ public class StickManupulate : MonoBehaviour
 		public Transform rayHere;
 	};
 
+	private static float MY_SCORE = 0;
+	public static bool DOES_IT_HIT = false;
+
+	public static float addScore(float score){
+		MY_SCORE += score;
+		return MY_SCORE;
+	}
+
+
 	private Vector3[] localPositions;
 
 	public Transform mainStack;
@@ -120,6 +129,8 @@ public class StickManupulate : MonoBehaviour
 	void Update ()
 	{
 
+		scoreText.text = Mathf.CeilToInt (MY_SCORE)+"";
+
 		Vector3 stackposition = mainStack.transform.localPosition;
 		if (stackposition.y> stackPositionNext) {
 			stackposition.y -= Time.deltaTime * 5;
@@ -147,16 +158,16 @@ public class StickManupulate : MonoBehaviour
 
 
 		if (Input.GetMouseButtonDown (0)) {
-			Vector3 mousePositionInWorldPoint = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-			if (mousePositionInWorldPoint.x <= currentObject.rayHere.position.x + 0.2f && mousePositionInWorldPoint.x >= currentObject.rayHere.position.x - 0.2f) {
-
+			//Vector3 mousePositionInWorldPoint = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+			//if (mousePositionInWorldPoint.x <= currentObject.rayHere.position.x + 0.2f && mousePositionInWorldPoint.x >= currentObject.rayHere.position.x - 0.2f) {
+				DOES_IT_HIT = false;
 				currentObject.baseObject.AddComponent<Rigidbody> ();
 				StartCoroutine(incrementQueue());
-				scoreText.text = (++totalScore) + "";
 
-			}
+			//}
 
 		}
 
 	}
+
 }
