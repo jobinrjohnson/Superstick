@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.EventSystems;
 
 public class StickManupulate : MonoBehaviour
 {
@@ -30,6 +30,7 @@ public class StickManupulate : MonoBehaviour
 	public Transform mainStack;
 	public objects[] stack;
 	public Text scoreText;
+	public Button pauseButton;
 
 	private float translate = 30;
 
@@ -49,8 +50,33 @@ public class StickManupulate : MonoBehaviour
 	private int objectPointer = 0;
 	private int stackPositionNext = 0;
 
+	void PauseGame(){
+		Object[] objects = FindObjectsOfType (typeof(GameObject));
+		foreach (GameObject go in objects) {
+			go.SendMessage ("OnPauseGame", SendMessageOptions.DontRequireReceiver);
+		}
+		Debug.Log ("You have clicked the button!");
+	}	
+	void ResumeGame(){
+		Object[] objects = FindObjectsOfType (typeof(GameObject));
+		foreach (GameObject go in objects) {
+			go.SendMessage ("OnResumeGame", SendMessageOptions.DontRequireReceiver);
+		}
+		Debug.Log ("You have clicked the button!");
+	}
+
+	bool paused = true;{
+		paused = true;
+	}
+	void OnResumeGame (){
+		paused = false;
+	}
+
 	void Start ()
 	{
+
+		Button btn = pauseButton.GetComponent<Button>();
+
 		stack = new objects[mainStack.childCount];
 		for (int i = 0; i < mainStack.childCount; i++) {
 			stack [i] = new objects ();
@@ -108,43 +134,58 @@ public class StickManupulate : MonoBehaviour
 
 	void Update ()
 	{
+		if (!paused) {
+			
+			scoreText.text = Mathf.CeilToInt (MY_SCORE) + "";
 
-		scoreText.text = Mathf.CeilToInt (MY_SCORE) + "";
+			if (DOES_IT_HIT && previousObject.baseObject != null) {
+				incrementQueue ();
+			}
 
+			Vector3 stackposition = mainStack.transform.localPosition;
+			if (stackposition.y > stackPositionNext) {
+				stackposition.y -= Time.deltaTime * 5;
+				mainStack.transform.localPosition = stackposition;
+			}
 
-		if (DOES_IT_HIT && previousObject.baseObject != null) {
-			incrementQueue ();
+			currentObject = stack [objectPointer];
+			updateBases ();
+
+			translate += Time.deltaTime * 5 * controlSign * (totalScore == 0 ? 1 : totalScore);
+
+			if (translate < 30) {
+				controlSign = 1;
+			} else if (translate > 60) {
+				controlSign = -1;
+			}
+
+			currentObject.left.transform.localRotation = Quaternion.Euler (0, 0, translate);
+			currentObject.right.transform.localRotation = Quaternion.Euler (0, 0, 90 + translate);
+
+			float cornerAngle = Mathf.Deg2Rad * (translate);
+
+			currentObject.right.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Cos (cornerAngle) + .04f, .1f);
+			currentObject.left.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Sin (cornerAngle) + .04f, .1f);
 		}
-
-		Vector3 stackposition = mainStack.transform.localPosition;
-		if (stackposition.y > stackPositionNext) {
-			stackposition.y -= Time.deltaTime * 5;
-			mainStack.transform.localPosition = stackposition;
-		}
-
-		currentObject = stack [objectPointer];
-		updateBases ();
-
-		translate += Time.deltaTime * 5 * controlSign * (totalScore == 0 ? 1 : totalScore);
-
-		if (translate < 30) {
-			controlSign = 1;
-		} else if (translate > 60) {
-			controlSign = -1;
-		}
-
-		currentObject.left.transform.localRotation = Quaternion.Euler (0, 0, translate);
-		currentObject.right.transform.localRotation = Quaternion.Euler (0, 0, 90 + translate);
-
-		float cornerAngle = Mathf.Deg2Rad * (translate);
-
-		currentObject.right.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Cos (cornerAngle) + .04f, .1f);
-		currentObject.left.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Sin (cornerAngle) + .04f, .1f);
-
 
 		if (Input.GetMouseButtonDown (0) && !HIT_INTD) {
-			//Vector3 mousePositionInWorldPoint = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-			//if (mousePositionInWorldPoint.x <= currentObject.rayHere.position.x + 0.2f && mousePositionInWorldPoint.x >= currentObject.rayHere.position.x - 0.2f) {
+
+			bool isMouseOnPause = (Input.mousePosition.x <= pauseButton.transform.position.x + 30f && Input.mousePosition.x >= pauseButton.transform.position.x - 30f) &&
+			                      (Input.mousePosition.y <= pauseButton.transform.position.y + 30f && Input.mousePosition.y >= pauseButton.transform.position.y - 30f);
+
+			if (isMouseOnPause) {
+				if (paused) {
+					ResumeGame ();
+				} else {
+					PauseGame ();
+				}
+				return;
+			}
+
+			if (paused) {
+				return;
+			}
+
 			noOfClicksDown++;
 			stackPositionNext -= 2;
 			previousObject = currentObject;
@@ -152,9 +193,7 @@ public class StickManupulate : MonoBehaviour
 			DOES_IT_HIT = false;
 			HIT_INTD = true;
 			currentObject.baseObject.AddComponent<Rigidbody> ();
-
 			translate = 45;
-			//}
 
 		}
 

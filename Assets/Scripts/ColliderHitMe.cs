@@ -2,32 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColliderhitMe : MonoBehaviour
-{
+public class ColliderhitMe : MonoBehaviour {
 
-	void Start ()
-	{
+	bool paused = true;
+
+	void OnPauseGame () {
+		paused = true;
+	}
+
+	void OnResumeGame () {
+		paused = false;
+	}
+
+	void Start () {
 		
 	}
 
-	void Update ()
-	{
+	void Update () {
 		
 	}
 
 	public Transform explosionPrefab;
 	private Transform explosive = null;
 
-	IEnumerator destroyExplosive ()
-	{
+	IEnumerator destroyExplosive () {
 		yield return new WaitForSeconds (2);
 		if (explosive != null) {
 			Destroy (explosive.gameObject);
 		}
 	}
 
-	void OnCollisionEnter (Collision collision)
-	{
+	void OnCollisionEnter (Collision collision) {
 
 		if (StickManupulate.DOES_IT_HIT || gameObject.GetComponent<MeshRenderer> ().enabled == false) {
 			StickManupulate.DOES_IT_HIT = true;

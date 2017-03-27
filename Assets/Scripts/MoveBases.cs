@@ -9,16 +9,28 @@ public class MoveBases : MonoBehaviour
 
 	public Transform mbase;
 
-	void Start ()
-	{
+	bool paused = true;
+
+	void OnPauseGame () {
+		paused = true;
+	}
+
+	void OnResumeGame () {
+		paused = false;
+	}
+
+	void Start () {
 		bases = new GameObject[3];
 		for (int i = 0; i < mbase.childCount; i++) {
 			bases [i] = mbase.GetChild (i).gameObject;
 		}
 	}
 
-	void Update ()
-	{
+	void Update () {
+		if (paused) {
+			return;
+		}
+
 		float worldScreenWidth = (float)((Camera.main.orthographicSize * 2.0) / Screen.height * Screen.width * .5) * .5f;
 		float time = Time.deltaTime * .4f;
 		for (int i = 0; i < mbase.childCount; i++) {
