@@ -47,12 +47,13 @@ public class StickManupulate : MonoBehaviour {
 	private int objectPointer = 0;
 	private int stackPositionNext = 0;
 
+
+
 	void PauseGame () {
 		Object[] objects = FindObjectsOfType (typeof(GameObject));
 		foreach (GameObject go in objects) {
 			go.SendMessage ("OnPauseGame", SendMessageOptions.DontRequireReceiver);
 		}
-		Debug.Log ("You have clicked the button!");
 	}
 
 	void ResumeGame () {
@@ -60,7 +61,6 @@ public class StickManupulate : MonoBehaviour {
 		foreach (GameObject go in objects) {
 			go.SendMessage ("OnResumeGame", SendMessageOptions.DontRequireReceiver);
 		}
-		Debug.Log ("You have clicked the button!");
 	}
 
 	bool paused = true;
