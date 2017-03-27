@@ -4,12 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class StickManupulate : MonoBehaviour
-{
+public class StickManupulate : MonoBehaviour {
 
 
-	public struct objects
-	{
+	public struct objects {
 		public GameObject baseObject;
 		public GameObject left;
 		public GameObject right;
@@ -21,8 +19,7 @@ public class StickManupulate : MonoBehaviour
 	public static int noOfClicksDown = 0;
 	public static bool HIT_INTD = false;
 
-	public static float addScore (float score)
-	{
+	public static float addScore (float score) {
 		MY_SCORE += score;
 		return MY_SCORE;
 	}
@@ -50,14 +47,15 @@ public class StickManupulate : MonoBehaviour
 	private int objectPointer = 0;
 	private int stackPositionNext = 0;
 
-	void PauseGame(){
+	void PauseGame () {
 		Object[] objects = FindObjectsOfType (typeof(GameObject));
 		foreach (GameObject go in objects) {
 			go.SendMessage ("OnPauseGame", SendMessageOptions.DontRequireReceiver);
 		}
 		Debug.Log ("You have clicked the button!");
-	}	
-	void ResumeGame(){
+	}
+
+	void ResumeGame () {
 		Object[] objects = FindObjectsOfType (typeof(GameObject));
 		foreach (GameObject go in objects) {
 			go.SendMessage ("OnResumeGame", SendMessageOptions.DontRequireReceiver);
@@ -65,17 +63,19 @@ public class StickManupulate : MonoBehaviour
 		Debug.Log ("You have clicked the button!");
 	}
 
-	bool paused = true;{
+	bool paused = true;
+
+	void OnPauseGame () {
 		paused = true;
 	}
-	void OnResumeGame (){
+
+	void OnResumeGame () {
 		paused = false;
 	}
 
-	void Start ()
-	{
+	void Start () {
 
-		Button btn = pauseButton.GetComponent<Button>();
+		Button btn = pauseButton.GetComponent<Button> ();
 
 		stack = new objects[mainStack.childCount];
 		for (int i = 0; i < mainStack.childCount; i++) {
@@ -95,8 +95,7 @@ public class StickManupulate : MonoBehaviour
 
 
 
-	private void updateBases ()
-	{
+	private void updateBases () {
 		worldScreenHeight = (float)(Camera.main.orthographicSize * 2.0);
 		worldScreenWidth = (float)(worldScreenHeight / Screen.height * Screen.width * .5);
 		screenFactor = worldScreenHeight / Screen.height;
@@ -113,8 +112,7 @@ public class StickManupulate : MonoBehaviour
 		baseWidth = currentObject.right.transform.localPosition.x - currentObject.left.transform.localPosition.x;
 	}
 
-	private void incrementQueue ()
-	{
+	private void incrementQueue () {
 
 		Destroy (previousObject.baseObject.GetComponent<Rigidbody> ());
 		float translate = 45f;
@@ -132,8 +130,7 @@ public class StickManupulate : MonoBehaviour
 	}
 
 
-	void Update ()
-	{
+	void Update () {
 		if (!paused) {
 			
 			scoreText.text = Mathf.CeilToInt (MY_SCORE) + "";
