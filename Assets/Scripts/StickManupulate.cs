@@ -22,6 +22,9 @@ public class StickManupulate : MonoBehaviour {
 	public static float addScore (float score) {
 		MY_SCORE += score;
 		return MY_SCORE;
+	}	
+	public static int getScore () {
+		return Mathf.CeilToInt (MY_SCORE);
 	}
 
 	public Transform mainStack;
@@ -48,6 +51,11 @@ public class StickManupulate : MonoBehaviour {
 	private int stackPositionNext = 0;
 
 
+
+	void OnEndGame(){
+		paused = true;
+
+	}
 
 	void PauseGame () {
 		Object[] objects = FindObjectsOfType (typeof(GameObject));

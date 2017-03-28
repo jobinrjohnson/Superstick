@@ -22,6 +22,12 @@ public class ColliderhitMe : MonoBehaviour {
 		
 	}
 
+
+	void OnEndGame(){
+		paused = true;
+
+	}
+
 	public Transform explosionPrefab;
 	private Transform explosive = null;
 
