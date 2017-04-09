@@ -23,10 +23,22 @@ public class ColliderhitMe : MonoBehaviour {
 	}
 
 
-	void OnEndGame(){
+	void OnRestartGame () {
+		paused = false;
+	}
+
+	void OnEndGame () {
 		paused = true;
 
 	}
+
+	void EndForNow () {
+		Object[] objects = FindObjectsOfType (typeof(GameObject));
+		foreach (GameObject go in objects) {
+			go.SendMessage ("OnEndGame", SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
 
 	public Transform explosionPrefab;
 	private Transform explosive = null;
@@ -40,8 +52,13 @@ public class ColliderhitMe : MonoBehaviour {
 
 	void OnCollisionEnter (Collision collision) {
 
-		if (StickManupulate.DOES_IT_HIT || gameObject.GetComponent<MeshRenderer> ().enabled == false) {
+		if (StickManupulate.DOES_IT_HIT) {
+			return;
+		}
+
+		if (gameObject.GetComponent<MeshRenderer> ().enabled == false) {
 			StickManupulate.DOES_IT_HIT = true;
+			EndForNow ();
 			return;
 		}
 

@@ -31,6 +31,7 @@ public class StickManupulate : MonoBehaviour {
 	public objects[] stack;
 	public Text scoreText;
 	public Button pauseButton;
+	public Transform backgroundCube;
 
 	private float translate = 30;
 
@@ -57,6 +58,24 @@ public class StickManupulate : MonoBehaviour {
 
 	}
 
+	void OnRestartGame(){
+		paused = false;
+		Start ();
+
+		for (int i = 0; i < mainStack.childCount; i++) {
+			stack [i].baseObject.transform.localPosition = new Vector3 (0, 2 * i, 0);
+			stack [i].baseObject.transform.localRotation = Quaternion.Euler (0, 0, 0);
+			float translate = 45f;
+			stack [i].left.transform.localRotation = Quaternion.Euler (0, 0, translate);
+			stack [i].right.transform.localRotation = Quaternion.Euler (0, 0, 90 + translate);
+			float cornerAngle = Mathf.Deg2Rad * (translate);
+			stack [i].right.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Cos (cornerAngle) + .04f, .1f);
+			stack [i].left.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Sin (cornerAngle) + .04f, .1f);
+			stack [i].baseObject.transform.localRotation = Quaternion.Euler (0f, 0f, 0f);
+		}
+
+	}
+
 	void PauseGame () {
 		Object[] objects = FindObjectsOfType (typeof(GameObject));
 		foreach (GameObject go in objects) {
@@ -75,6 +94,8 @@ public class StickManupulate : MonoBehaviour {
 
 	void OnPauseGame () {
 		paused = true;
+		MeshRenderer render = gameObject.GetComponentInChildren<MeshRenderer>();
+		render.enabled = false;
 	}
 
 	void OnResumeGame () {
@@ -82,6 +103,9 @@ public class StickManupulate : MonoBehaviour {
 	}
 
 	void Start () {
+
+		MY_SCORE = noOfClicksDown = objectPointer = stackPositionNext = 0;
+		DOES_IT_HIT = HIT_INTD = false;
 
 		Button btn = pauseButton.GetComponent<Button> ();
 
@@ -97,8 +121,15 @@ public class StickManupulate : MonoBehaviour {
 					stack [i].right = stack [i].baseObject.transform.GetChild (j).gameObject;
 				}
 			}
+
+			Color c = Random.ColorHSV ();
+			Destroy (stack [i].baseObject.GetComponent<Rigidbody> ());
+			stack [i].left.GetComponent<Renderer> ().material.color = c;
+			stack [i].right.GetComponent<Renderer> ().material.color = c;
 		}
 		currentObject = stack [objectPointer];
+
+		mainStack.localPosition = new Vector3 (0, 0, 0);
 	}
 
 
@@ -118,6 +149,8 @@ public class StickManupulate : MonoBehaviour {
 		currentObject.right.transform.localPosition = ls;
 
 		baseWidth = currentObject.right.transform.localPosition.x - currentObject.left.transform.localPosition.x;
+
+		backgroundCube.localScale = new Vector3 (worldScreenWidth * 2, worldScreenHeight * 2, 1);
 	}
 
 	private void incrementQueue () {
@@ -135,12 +168,16 @@ public class StickManupulate : MonoBehaviour {
 		DOES_IT_HIT = false;
 		HIT_INTD = false;
 
+
+		Color c = Random.ColorHSV ();
+		previousObject.left.GetComponent<Renderer> ().material.color = c;
+		previousObject.right.GetComponent<Renderer> ().material.color = c;
+
 	}
 
 
 	void Update () {
 		if (!paused) {
-			
 			scoreText.text = Mathf.CeilToInt (MY_SCORE) + "";
 
 			if (DOES_IT_HIT && previousObject.baseObject != null) {
@@ -190,7 +227,7 @@ public class StickManupulate : MonoBehaviour {
 			if (paused) {
 				return;
 			}
-
+			controlSign *= -1;
 			noOfClicksDown++;
 			stackPositionNext -= 2;
 			previousObject = currentObject;
