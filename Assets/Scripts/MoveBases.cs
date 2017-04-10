@@ -32,7 +32,7 @@ public class MoveBases : MonoBehaviour {
 	void EndForNow () {
 		Object[] objects = FindObjectsOfType (typeof(GameObject));
 		foreach (GameObject go in objects) {
-			//go.SendMessage ("OnEndGame", SendMessageOptions.DontRequireReceiver);
+			go.SendMessage ("OnEndGame", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 

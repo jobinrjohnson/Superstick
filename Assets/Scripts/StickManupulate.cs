@@ -55,7 +55,6 @@ public class StickManupulate : MonoBehaviour {
 
 	void OnEndGame(){
 		paused = true;
-
 	}
 
 	void OnRestartGame(){
@@ -68,6 +67,8 @@ public class StickManupulate : MonoBehaviour {
 			float translate = 45f;
 			stack [i].left.transform.localRotation = Quaternion.Euler (0, 0, translate);
 			stack [i].right.transform.localRotation = Quaternion.Euler (0, 0, 90 + translate);
+			stack [i].right.GetComponent<MeshRenderer> ().enabled = true;
+			stack [i].left.GetComponent<MeshRenderer> ().enabled = true;
 			float cornerAngle = Mathf.Deg2Rad * (translate);
 			stack [i].right.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Cos (cornerAngle) + .04f, .1f);
 			stack [i].left.transform.localScale = new Vector3 (.1f, baseWidth * Mathf.Sin (cornerAngle) + .04f, .1f);

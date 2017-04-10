@@ -2,18 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using GoogleMobileAds.Api;
 
 public class MenuScript : MonoBehaviour {
 
 	public Button resumeButton, optional_btn, exitButton;
-	public Transform MenuPanel, DarkPanel;
-	public Text scoreText;
+	public Transform MenuPanel;
+	public Text scoreText, extraText;
 
 	public Sprite restartSprite, infoSprite;
 
 	bool paused = true;
 	bool ended = false;
 	bool firsttime = true;
+	public static int HIGH_SCORE = 0;
+	private InterstitialAd interstitial;
+
+
+	private void RequestInterstitial () {
+		#if UNITY_ANDROID
+		string adUnitId = "ca-app-pub-6479565236772083/3187905053";
+		#elif UNITY_IPHONE
+		string adUnitId = "INSERT_IOS_INTERSTITIAL_AD_UNIT_ID_HERE";
+		#else
+		string adUnitId = "unexpected_platform";
+		#endif
+
+		interstitial = new InterstitialAd (adUnitId);
+		AdRequest request = new AdRequest.Builder ().Build ();
+		interstitial.LoadAd (request);
+	}
+
 
 	void OnPauseGame () {
 		ShowPanel ();
@@ -44,6 +63,18 @@ public class MenuScript : MonoBehaviour {
 	}
 
 	void OnEndGame () {
+		if (interstitial.IsLoaded ()) {
+			interstitial.Show ();
+		}
+
+		if (HIGH_SCORE < StickManupulate.getScore ()) {
+			PlayerPrefs.SetInt ("highscore", StickManupulate.getScore ());
+			HIGH_SCORE = StickManupulate.getScore ();
+			extraText.text = "New High Scores";
+		} else {
+			extraText.text = "High Score : " + HIGH_SCORE;
+		}
+
 		ShowPanel ();
 		resumeButton.GetComponentInChildren<Text> ().text = "";
 		paused = ended = true;
@@ -80,10 +111,15 @@ public class MenuScript : MonoBehaviour {
 	}
 
 	void Start () {
+		RequestInterstitial ();
 		resumeButton.onClick.AddListener (ResumeMyGame);
 		MenuPanel.gameObject.SetActive (true);
 		optional_btn.onClick.AddListener (RestartOrInfoClicked);
 		exitButton.onClick.AddListener (Exit);
+
+		HIGH_SCORE =	PlayerPrefs.GetInt ("highscore");
+		scoreText.text = HIGH_SCORE + "";
+		extraText.text = "High Score";
 	}
 
 	void Update () {
