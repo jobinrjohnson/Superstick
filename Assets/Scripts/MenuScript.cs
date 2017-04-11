@@ -65,8 +65,7 @@ public class MenuScript : MonoBehaviour {
 	void OnEndGame () {
 		if (interstitial.IsLoaded ()) {
 			interstitial.Show ();
-          	AdRequest request = new AdRequest.Builder ().Build ();
-			interstitial.LoadAd (request);
+			RequestInterstitial ();
 		}
 
 		if (HIGH_SCORE < StickManupulate.getScore ()) {
