@@ -66,10 +66,9 @@ public class MoveBases : MonoBehaviour {
 				baseSpeed += baseSpeed < 1 ? .05f : 0.009f;
 				Time.timeScale = 1f + baseSpeed - .5f;
 
-				//print (baseSpeed);
-
 			}
 			bases [i].transform.localPosition = new Vector3 (0, x, 0f);
+
 		}
 	}
 

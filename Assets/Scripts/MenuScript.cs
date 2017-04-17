@@ -68,7 +68,7 @@ public class MenuScript : MonoBehaviour {
 			RequestInterstitial ();
 		}
 
-		if (HIGH_SCORE < StickManupulate.getScore ()) {
+		if (HIGH_SCORE <= StickManupulate.getScore ()) {
 			PlayerPrefs.SetInt ("highscore", StickManupulate.getScore ());
 			HIGH_SCORE = StickManupulate.getScore ();
 			extraText.text = "New High Scores";
